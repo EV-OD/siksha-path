@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
+import { RedisModule } from './redis/redis.module';
 import appConfig from './config/app.config';
 
 /**
@@ -30,6 +31,9 @@ import appConfig from './config/app.config';
     
     // Database connection module
     DatabaseModule,
+    
+    // Redis module for caching and real-time features
+    RedisModule,
     
     // Feature modules will be added here as we develop them:
     // AuthModule,

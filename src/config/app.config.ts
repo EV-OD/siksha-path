@@ -28,6 +28,12 @@ export interface AppConfig {
   zoomClientId: string;
   zoomClientSecret: string;
   zoomSecretToken: string;
+  
+  // Redis settings
+  redisHost: string;
+  redisPort: number;
+  redisUsername: string;
+  redisPassword: string;
 }
 
 export default (): AppConfig => ({
@@ -54,4 +60,10 @@ export default (): AppConfig => ({
   zoomClientId: process.env.Client_ID || '',
   zoomClientSecret: process.env.Client_Secret || '',
   zoomSecretToken: process.env.secret_token || '',
+  
+  // Redis configuration
+  redisHost: process.env.REDIS_HOST || 'localhost',
+  redisPort: parseInt(process.env.REDIS_PORT || '6379', 10),
+  redisUsername: process.env.REDIS_USERNAME || '',
+  redisPassword: process.env.REDIS_PASSWORD || '',
 });

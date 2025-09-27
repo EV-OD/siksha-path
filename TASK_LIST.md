@@ -41,13 +41,14 @@
   - **Dependencies**: SETUP-001
   - **Status**: ✅ Completed
 
-- [ ] **SETUP-004** Setup Redis for caching and WebSockets
-  - [ ] Install Redis client packages
-  - [ ] Configure Redis connection
-  - [ ] Setup pub/sub for real-time features
+- [x] **SETUP-004** Setup Redis for caching and WebSockets
+  - [x] Install Redis client packages
+  - [x] Configure Redis connection
+  - [x] Setup pub/sub for real-time features
   - **Assignee**: Backend Developer
   - **Estimated Time**: 3 hours
   - **Dependencies**: SETUP-001
+  - **Status**: ✅ Completed
 
 ### 1.2 Database Schema Design
 - [x] **DB-001** Design User schema (Student/Teacher/Admin roles)
