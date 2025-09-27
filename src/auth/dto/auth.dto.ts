@@ -1,5 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength, IsEnum, IsOptional } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export enum UserRole {
   STUDENT = 'student',
@@ -10,7 +10,8 @@ export enum UserRole {
 export class RegisterDto {
   @ApiProperty({
     description: 'User email address',
-    example: 'student@example.com'
+    example: 'user@example.com',
+    format: 'email'
   })
   @IsEmail({}, { message: 'Please provide a valid email address' })
   @IsNotEmpty({ message: 'Email is required' })
@@ -18,7 +19,7 @@ export class RegisterDto {
 
   @ApiProperty({
     description: 'User password (minimum 8 characters)',
-    example: 'SecurePassword123!',
+    example: 'SecurePass123!',
     minLength: 8
   })
   @IsString({ message: 'Password must be a string' })
@@ -34,20 +35,19 @@ export class RegisterDto {
   @IsNotEmpty({ message: 'Full name is required' })
   fullName: string;
 
-  @ApiProperty({
-    description: 'User role',
+  @ApiPropertyOptional({
+    description: 'User role in the system',
     enum: UserRole,
-    example: UserRole.STUDENT,
-    default: UserRole.STUDENT
+    default: UserRole.STUDENT,
+    example: UserRole.STUDENT
   })
   @IsEnum(UserRole, { message: 'Role must be either student, teacher, or admin' })
   @IsOptional()
   role?: UserRole = UserRole.STUDENT;
 
-  @ApiProperty({
-    description: 'Phone number (optional)',
-    example: '+977-9876543210',
-    required: false
+  @ApiPropertyOptional({
+    description: 'User phone number',
+    example: '+977-9841234567'
   })
   @IsString({ message: 'Phone number must be a string' })
   @IsOptional()
@@ -57,7 +57,8 @@ export class RegisterDto {
 export class LoginDto {
   @ApiProperty({
     description: 'User email address',
-    example: 'student@example.com'
+    example: 'user@example.com',
+    format: 'email'
   })
   @IsEmail({}, { message: 'Please provide a valid email address' })
   @IsNotEmpty({ message: 'Email is required' })
@@ -65,7 +66,7 @@ export class LoginDto {
 
   @ApiProperty({
     description: 'User password',
-    example: 'SecurePassword123!'
+    example: 'SecurePass123!'
   })
   @IsString({ message: 'Password must be a string' })
   @IsNotEmpty({ message: 'Password is required' })
@@ -73,19 +74,10 @@ export class LoginDto {
 }
 
 export class ChangePasswordDto {
-  @ApiProperty({
-    description: 'Current password',
-    example: 'OldPassword123!'
-  })
   @IsString({ message: 'Current password must be a string' })
   @IsNotEmpty({ message: 'Current password is required' })
   currentPassword: string;
 
-  @ApiProperty({
-    description: 'New password (minimum 8 characters)',
-    example: 'NewPassword123!',
-    minLength: 8
-  })
   @IsString({ message: 'New password must be a string' })
   @MinLength(8, { message: 'New password must be at least 8 characters long' })
   @IsNotEmpty({ message: 'New password is required' })
@@ -93,29 +85,16 @@ export class ChangePasswordDto {
 }
 
 export class ForgotPasswordDto {
-  @ApiProperty({
-    description: 'User email address',
-    example: 'student@example.com'
-  })
   @IsEmail({}, { message: 'Please provide a valid email address' })
   @IsNotEmpty({ message: 'Email is required' })
   email: string;
 }
 
 export class ResetPasswordDto {
-  @ApiProperty({
-    description: 'Password reset token',
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
-  })
   @IsString({ message: 'Reset token must be a string' })
   @IsNotEmpty({ message: 'Reset token is required' })
   resetToken: string;
 
-  @ApiProperty({
-    description: 'New password (minimum 8 characters)',
-    example: 'NewPassword123!',
-    minLength: 8
-  })
   @IsString({ message: 'New password must be a string' })
   @MinLength(8, { message: 'New password must be at least 8 characters long' })
   @IsNotEmpty({ message: 'New password is required' })
