@@ -20,7 +20,7 @@ import { RolesGuard } from './guards/roles.guard';
         if (!jwtSecret) {
           throw new Error('JWT_SECRET is required in environment variables');
         }
-        
+
         return {
           secret: jwtSecret,
           signOptions: {
@@ -31,17 +31,7 @@ import { RolesGuard } from './guards/roles.guard';
     }),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    JwtStrategy,
-    JwtAuthGuard,
-    RolesGuard,
-  ],
-  exports: [
-    AuthService,
-    JwtAuthGuard,
-    RolesGuard,
-    JwtStrategy,
-  ],
+  providers: [AuthService, JwtStrategy, JwtAuthGuard, RolesGuard],
+  exports: [AuthService, JwtAuthGuard, RolesGuard, JwtStrategy],
 })
 export class AuthModule {}

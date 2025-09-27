@@ -25,14 +25,16 @@ async function bootstrap() {
   // Minimal Swagger documentation
   const config = new DocumentBuilder()
     .setTitle('🎓 SikshaPath API')
-    .setDescription(`**Nepal\'s E-Learning Platform API**
+    .setDescription(
+      `**Nepal\'s E-Learning Platform API**
     
 **Quick Start:** Register → Login → Authorize 🔒 → Test endpoints
 
 **⚠️ Special Notes:**
 • **Admin endpoints**: Require admin role (user management)  
 • **Teacher endpoints**: Require teacher role (profile/teacher)
-• **Authentication**: Most endpoints require valid JWT token`)
+• **Authentication**: Most endpoints require valid JWT token`,
+    )
     .setVersion('1.0.0')
     .addServer(`http://localhost:${process.env.PORT || 3000}`, 'Dev')
     .addBearerAuth(
@@ -44,10 +46,10 @@ async function bootstrap() {
         description: 'JWT token from /auth/login',
         in: 'header',
       },
-      'JWT-auth'
+      'JWT-auth',
     )
     .addTag('🔐 Auth', 'Authentication & authorization')
-    .addTag('👥 Users', 'User & profile management') 
+    .addTag('👥 Users', 'User & profile management')
     .addTag('📚 Courses', 'Course operations')
     .addTag('💰 Payments', 'Payment processing')
     .addTag('🎥 Classes', 'Live class management')
@@ -145,7 +147,7 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
-  
+
   console.log(`🚀 API: http://localhost:${port}`);
   console.log(`📚 Docs: http://localhost:${port}/api/docs`);
 }

@@ -1,17 +1,24 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength, IsEnum, IsOptional } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  MinLength,
+  IsEnum,
+  IsOptional,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export enum UserRole {
   STUDENT = 'student',
   TEACHER = 'teacher',
-  ADMIN = 'admin'
+  ADMIN = 'admin',
 }
 
 export class RegisterDto {
   @ApiProperty({
     description: 'User email address',
     example: 'user@example.com',
-    format: 'email'
+    format: 'email',
   })
   @IsEmail({}, { message: 'Please provide a valid email address' })
   @IsNotEmpty({ message: 'Email is required' })
@@ -20,7 +27,7 @@ export class RegisterDto {
   @ApiProperty({
     description: 'User password (minimum 8 characters)',
     example: 'SecurePass123!',
-    minLength: 8
+    minLength: 8,
   })
   @IsString({ message: 'Password must be a string' })
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
@@ -29,7 +36,7 @@ export class RegisterDto {
 
   @ApiProperty({
     description: 'User full name',
-    example: 'John Doe'
+    example: 'John Doe',
   })
   @IsString({ message: 'Full name must be a string' })
   @IsNotEmpty({ message: 'Full name is required' })
@@ -39,15 +46,17 @@ export class RegisterDto {
     description: 'User role in the system',
     enum: UserRole,
     default: UserRole.STUDENT,
-    example: UserRole.STUDENT
+    example: UserRole.STUDENT,
   })
-  @IsEnum(UserRole, { message: 'Role must be either student, teacher, or admin' })
+  @IsEnum(UserRole, {
+    message: 'Role must be either student, teacher, or admin',
+  })
   @IsOptional()
   role?: UserRole = UserRole.STUDENT;
 
   @ApiPropertyOptional({
     description: 'User phone number',
-    example: '+977-9841234567'
+    example: '+977-9841234567',
   })
   @IsString({ message: 'Phone number must be a string' })
   @IsOptional()
@@ -58,7 +67,7 @@ export class LoginDto {
   @ApiProperty({
     description: 'User email address',
     example: 'user@example.com',
-    format: 'email'
+    format: 'email',
   })
   @IsEmail({}, { message: 'Please provide a valid email address' })
   @IsNotEmpty({ message: 'Email is required' })
@@ -66,7 +75,7 @@ export class LoginDto {
 
   @ApiProperty({
     description: 'User password',
-    example: 'SecurePass123!'
+    example: 'SecurePass123!',
   })
   @IsString({ message: 'Password must be a string' })
   @IsNotEmpty({ message: 'Password is required' })

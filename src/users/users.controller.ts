@@ -1,21 +1,21 @@
-import { 
-  Controller, 
-  Get, 
-  Put, 
-  Body, 
-  Param, 
-  UseGuards, 
-  Query, 
+import {
+  Controller,
+  Get,
+  Put,
+  Body,
+  Param,
+  UseGuards,
+  Query,
   Patch,
   HttpStatus,
   HttpCode,
-  ParseUUIDPipe
+  ParseUUIDPipe,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
-  ApiBearerAuth, 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiParam,
   ApiQuery,
@@ -26,7 +26,11 @@ import { Roles } from '../auth/decorators/auth.decorators';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { UserRole } from '../auth/dto/auth.dto';
 import { UsersService } from './users.service';
-import { UpdateProfileDto, UpdateTeacherProfileDto, ProfileResponseDto } from './dto/profile.dto';
+import {
+  UpdateProfileDto,
+  UpdateTeacherProfileDto,
+  ProfileResponseDto,
+} from './dto/profile.dto';
 
 @ApiTags('👥 Users')
 @Controller('users')
@@ -49,7 +53,7 @@ export class UsersController {
   @ApiResponse({ status: 400, description: 'Invalid input' })
   async updateMyProfile(
     @CurrentUser() user: any,
-    @Body() updateProfileDto: UpdateProfileDto
+    @Body() updateProfileDto: UpdateProfileDto,
   ): Promise<ProfileResponseDto> {
     return this.usersService.updateProfile(user.id, updateProfileDto);
   }
@@ -62,9 +66,12 @@ export class UsersController {
   @ApiResponse({ status: 403, description: 'Forbidden - Teachers only' })
   async updateTeacherProfile(
     @CurrentUser() user: any,
-    @Body() updateTeacherProfileDto: UpdateTeacherProfileDto
+    @Body() updateTeacherProfileDto: UpdateTeacherProfileDto,
   ): Promise<ProfileResponseDto> {
-    return this.usersService.updateTeacherProfile(user.id, updateTeacherProfileDto);
+    return this.usersService.updateTeacherProfile(
+      user.id,
+      updateTeacherProfileDto,
+    );
   }
 
   @Get()
@@ -72,15 +79,24 @@ export class UsersController {
   @ApiOperation({ summary: 'Get all users (admin only)' })
   @ApiQuery({ name: 'page', required: false, description: 'Page number' })
   @ApiQuery({ name: 'limit', required: false, description: 'Items per page' })
-  @ApiQuery({ name: 'role', required: false, enum: UserRole, description: 'Filter by role' })
-  @ApiQuery({ name: 'search', required: false, description: 'Search by name or email' })
+  @ApiQuery({
+    name: 'role',
+    required: false,
+    enum: UserRole,
+    description: 'Filter by role',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Search by name or email',
+  })
   @ApiResponse({ status: 200, description: 'Users list with pagination' })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   async getAllUsers(
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
     @Query('role') role?: UserRole,
-    @Query('search') search?: string
+    @Query('search') search?: string,
   ) {
     const pageNum = parseInt(page, 10);
     const limitNum = parseInt(limit, 10);
@@ -94,7 +110,9 @@ export class UsersController {
   @ApiResponse({ status: 200, type: ProfileResponseDto })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async getUserById(@Param('id', ParseUUIDPipe) id: string): Promise<ProfileResponseDto> {
+  async getUserById(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ProfileResponseDto> {
     return this.usersService.getProfile(id);
   }
 
@@ -108,7 +126,7 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'User not found' })
   async updateUser(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateProfileDto: UpdateProfileDto
+    @Body() updateProfileDto: UpdateProfileDto,
   ): Promise<ProfileResponseDto> {
     return this.usersService.updateProfile(id, updateProfileDto);
   }

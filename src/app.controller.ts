@@ -20,13 +20,13 @@ export class AppController {
     // Test Redis caching
     const key = 'test-key';
     const value = { message: 'Redis is working!', timestamp: new Date() };
-    
+
     // Set value in cache
     await this.cacheManager.set(key, value, 300000); // 5 minutes TTL
-    
+
     // Get value from cache
     const cachedValue = await this.cacheManager.get(key);
-    
+
     return {
       status: 'success',
       cached: cachedValue,

@@ -13,12 +13,12 @@ import appConfig from './config/app.config';
 
 /**
  * Root Application Module
- * 
+ *
  * Follows NestJS modular architecture principles:
  * - ConfigModule for environment variables and app settings
  * - DatabaseModule for Drizzle ORM database connection
  * - Feature modules will be added as we implement them
- * 
+ *
  * The module is designed to be:
  * - Scalable: Easy to add new feature modules
  * - Maintainable: Clear separation of concerns
@@ -33,19 +33,19 @@ import appConfig from './config/app.config';
       envFilePath: '.env', // Specify .env file location
       cache: true, // Cache configuration for better performance
     }),
-    
+
     // Database connection module
     DatabaseModule,
-    
+
     // Redis module for caching and real-time features
     RedisModule,
-    
+
     // Authentication and authorization module
     AuthModule,
-    
+
     // User management module
     UsersModule,
-    
+
     // Future feature modules:
     // CoursesModule,
     // PaymentsModule,

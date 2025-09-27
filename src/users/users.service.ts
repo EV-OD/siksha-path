@@ -1,15 +1,23 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { eq, and } from 'drizzle-orm';
 import { ConfigService } from '@nestjs/config';
 import { Pool } from 'pg';
 import { users } from '../database/schemas/users.schema';
-import { UpdateProfileDto, UpdateTeacherProfileDto, ProfileResponseDto } from './dto/profile.dto';
+import {
+  UpdateProfileDto,
+  UpdateTeacherProfileDto,
+  ProfileResponseDto,
+} from './dto/profile.dto';
 
 @Injectable()
 export class UsersService {
   private db;
-  
+
   constructor(private configService: ConfigService) {
     const pool = new Pool({
       connectionString: this.configService.get<string>('DATABASE_URL'),
@@ -24,10 +32,7 @@ export class UsersService {
     const user = await this.db
       .select()
       .from(users)
-      .where(and(
-        eq(users.id, userId),
-        eq(users.isActive, 'true')
-      ))
+      .where(and(eq(users.id, userId), eq(users.isActive, 'true')))
       .limit(1);
 
     if (!user || user.length === 0) {
@@ -35,25 +40,25 @@ export class UsersService {
     }
 
     const userData = user[0];
-    
+
     // Remove sensitive data
     const { password, ...profileData } = userData;
-    
+
     return profileData as ProfileResponseDto;
   }
 
   /**
    * Update user profile
    */
-  async updateProfile(userId: string, updateData: UpdateProfileDto): Promise<ProfileResponseDto> {
+  async updateProfile(
+    userId: string,
+    updateData: UpdateProfileDto,
+  ): Promise<ProfileResponseDto> {
     // Check if user exists and is active
     const existingUser = await this.db
       .select()
       .from(users)
-      .where(and(
-        eq(users.id, userId),
-        eq(users.isActive, 'true')
-      ))
+      .where(and(eq(users.id, userId), eq(users.isActive, 'true')))
       .limit(1);
 
     if (!existingUser || existingUser.length === 0) {
@@ -81,16 +86,21 @@ export class UsersService {
   /**
    * Update teacher-specific profile fields
    */
-  async updateTeacherProfile(userId: string, updateData: UpdateTeacherProfileDto): Promise<ProfileResponseDto> {
+  async updateTeacherProfile(
+    userId: string,
+    updateData: UpdateTeacherProfileDto,
+  ): Promise<ProfileResponseDto> {
     // Check if user exists, is active, and is a teacher
     const existingUser = await this.db
       .select()
       .from(users)
-      .where(and(
-        eq(users.id, userId),
-        eq(users.isActive, 'true'),
-        eq(users.role, 'teacher')
-      ))
+      .where(
+        and(
+          eq(users.id, userId),
+          eq(users.isActive, 'true'),
+          eq(users.role, 'teacher'),
+        ),
+      )
       .limit(1);
 
     if (!existingUser || existingUser.length === 0) {
@@ -119,19 +129,24 @@ export class UsersService {
    * Get all users (admin only) with pagination
    */
   async getAllUsers(
-    page: number = 1, 
-    limit: number = 10, 
-    role?: string, 
-    search?: string
-  ): Promise<{ users: ProfileResponseDto[], total: number, page: number, limit: number }> {
+    page: number = 1,
+    limit: number = 10,
+    role?: string,
+    search?: string,
+  ): Promise<{
+    users: ProfileResponseDto[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
     const offset = (page - 1) * limit;
-    
-    let whereConditions = [eq(users.isActive, 'true')];
-    
+
+    const whereConditions = [eq(users.isActive, 'true')];
+
     if (role) {
       whereConditions.push(eq(users.role, role as any));
     }
-    
+
     // For search, we'll do a simple implementation
     // In production, you might want to use full-text search
     const allUsers = await this.db
@@ -142,7 +157,7 @@ export class UsersService {
       .limit(limit);
 
     // Remove passwords from all users
-    const safeUsers = allUsers.map(user => {
+    const safeUsers = allUsers.map((user) => {
       const { password, ...safeUser } = user;
       return safeUser as ProfileResponseDto;
     });
@@ -157,7 +172,7 @@ export class UsersService {
       users: safeUsers,
       total: totalResult.length,
       page,
-      limit
+      limit,
     };
   }
 
@@ -204,25 +219,25 @@ export class UsersService {
   /**
    * Update teacher verification status (admin only)
    */
-  async updateTeacherVerification(userId: string, isVerified: boolean): Promise<{ message: string }> {
+  async updateTeacherVerification(
+    userId: string,
+    isVerified: boolean,
+  ): Promise<{ message: string }> {
     const result = await this.db
       .update(users)
       .set({
         teacherVerified: isVerified ? 'true' : 'false',
         updatedAt: new Date(),
       })
-      .where(and(
-        eq(users.id, userId),
-        eq(users.role, 'teacher')
-      ))
+      .where(and(eq(users.id, userId), eq(users.role, 'teacher')))
       .returning();
 
     if (!result || result.length === 0) {
       throw new NotFoundException('Teacher not found');
     }
 
-    return { 
-      message: `Teacher ${isVerified ? 'verified' : 'unverified'} successfully` 
+    return {
+      message: `Teacher ${isVerified ? 'verified' : 'unverified'} successfully`,
     };
   }
 }

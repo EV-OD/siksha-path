@@ -15,7 +15,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!jwtSecret) {
       throw new Error('JWT_SECRET is required in environment variables');
     }
-    
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -26,15 +26,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: JwtPayload) {
     // Verify if user still exists and token is valid
     const user = await this.authService.validateUserById(payload.sub);
-    
+
     if (!user) {
       throw new UnauthorizedException('User not found or token invalid');
     }
 
     // Check if token is blacklisted
     const tokenIssuedAt = payload.iat || Math.floor(Date.now() / 1000);
-    const isTokenBlacklisted = await this.authService.isTokenBlacklisted(payload.sub, tokenIssuedAt);
-    
+    const isTokenBlacklisted = await this.authService.isTokenBlacklisted(
+      payload.sub,
+      tokenIssuedAt,
+    );
+
     if (isTokenBlacklisted) {
       throw new UnauthorizedException('Token has been revoked');
     }

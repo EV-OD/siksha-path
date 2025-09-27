@@ -8,11 +8,11 @@ import {
   Get,
   Patch,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
-  ApiBearerAuth, 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiConsumes,
   ApiProduces,
@@ -70,7 +70,9 @@ export class AuthController {
   @ApiBody({ type: RefreshTokenDto })
   @ApiResponse({ status: 200, type: LoginResponseDto })
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
-  async refreshToken(@Body() refreshTokenDto: RefreshTokenDto): Promise<LoginResponseDto> {
+  async refreshToken(
+    @Body() refreshTokenDto: RefreshTokenDto,
+  ): Promise<LoginResponseDto> {
     return this.authService.refreshToken(refreshTokenDto);
   }
 
@@ -79,13 +81,13 @@ export class AuthController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'User logout' })
   @ApiResponse({ status: 200, type: AuthSuccessDto })
-  @ApiResponse({ 
-    status: 401, 
+  @ApiResponse({
+    status: 401,
     description: 'Unauthorized - Invalid or missing token',
     example: {
       message: 'Unauthorized',
-      statusCode: 401
-    }
+      statusCode: 401,
+    },
   })
   async logout(@CurrentUser() user: any): Promise<AuthSuccessDto> {
     return this.authService.logout(user.id);
@@ -111,7 +113,9 @@ export class AuthController {
   @ApiOperation({ summary: 'Send password reset email' })
   @ApiBody({ type: ForgotPasswordDto })
   @ApiResponse({ status: 200, type: AuthSuccessDto })
-  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto): Promise<AuthSuccessDto> {
+  async forgotPassword(
+    @Body() forgotPasswordDto: ForgotPasswordDto,
+  ): Promise<AuthSuccessDto> {
     return this.authService.forgotPassword(forgotPasswordDto);
   }
 
@@ -122,7 +126,9 @@ export class AuthController {
   @ApiBody({ type: ResetPasswordDto })
   @ApiResponse({ status: 200, type: AuthSuccessDto })
   @ApiResponse({ status: 400, description: 'Invalid/expired token' })
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<AuthSuccessDto> {
+  async resetPassword(
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ): Promise<AuthSuccessDto> {
     return this.authService.resetPassword(resetPasswordDto);
   }
 

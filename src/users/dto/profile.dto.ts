@@ -1,11 +1,17 @@
-import { IsString, IsOptional, IsEmail, IsPhoneNumber, MaxLength } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsEmail,
+  IsPhoneNumber,
+  MaxLength,
+} from 'class-validator';
 import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
 
 export class UpdateProfileDto {
   @ApiPropertyOptional({
     description: 'User first name',
     example: 'John',
-    maxLength: 100
+    maxLength: 100,
   })
   @IsOptional()
   @IsString()
@@ -15,7 +21,7 @@ export class UpdateProfileDto {
   @ApiPropertyOptional({
     description: 'User last name',
     example: 'Doe',
-    maxLength: 100
+    maxLength: 100,
   })
   @IsOptional()
   @IsString()
@@ -25,7 +31,7 @@ export class UpdateProfileDto {
   @ApiPropertyOptional({
     description: 'User bio/description',
     example: 'Passionate learner interested in technology and education',
-    maxLength: 500
+    maxLength: 500,
   })
   @IsOptional()
   @IsString()
@@ -34,7 +40,7 @@ export class UpdateProfileDto {
 
   @ApiPropertyOptional({
     description: 'User phone number',
-    example: '+977-9841234567'
+    example: '+977-9841234567',
   })
   @IsOptional()
   @IsString()
@@ -42,7 +48,7 @@ export class UpdateProfileDto {
 
   @ApiPropertyOptional({
     description: 'User address',
-    example: 'Kathmandu, Nepal'
+    example: 'Kathmandu, Nepal',
   })
   @IsOptional()
   @IsString()

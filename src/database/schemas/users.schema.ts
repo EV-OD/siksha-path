@@ -1,16 +1,28 @@
-import { pgTable, uuid, varchar, text, timestamp, pgEnum, index } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  text,
+  timestamp,
+  pgEnum,
+  index,
+} from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 /**
  * User Role Enum
  * Defines the three main user types in the system
  */
-export const userRoleEnum = pgEnum('user_role', ['student', 'teacher', 'admin']);
+export const userRoleEnum = pgEnum('user_role', [
+  'student',
+  'teacher',
+  'admin',
+]);
 
 /**
  * Users Table Schema
  * Central table for all user types (Student/Teacher/Admin)
- * 
+ *
  * Design principles:
  * - Single table for all user types with role-based differentiation
  * - UUID primary keys for better security and scalability
@@ -25,26 +37,30 @@ export const users = pgTable(
     email: varchar('email', { length: 255 }).notNull().unique(),
     password: varchar('password', { length: 255 }).notNull(),
     role: userRoleEnum('role').notNull().default('student'),
-    
+
     // Profile fields
     firstName: varchar('first_name', { length: 100 }).notNull(),
     lastName: varchar('last_name', { length: 100 }).notNull(),
     bio: text('bio'),
     profilePicture: text('profile_picture'),
-    
+
     // Contact information
     phone: varchar('phone', { length: 20 }),
     address: text('address'),
-    
+
     // Account status
     isActive: varchar('is_active', { length: 10 }).notNull().default('true'),
-    isVerified: varchar('is_verified', { length: 10 }).notNull().default('false'),
-    
+    isVerified: varchar('is_verified', { length: 10 })
+      .notNull()
+      .default('false'),
+
     // Teacher-specific fields (nullable for students/admins)
-    teacherVerified: varchar('teacher_verified', { length: 10 }).default('false'),
+    teacherVerified: varchar('teacher_verified', { length: 10 }).default(
+      'false',
+    ),
     specialization: varchar('specialization', { length: 255 }),
     experience: text('experience'),
-    
+
     // Timestamps
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -54,7 +70,7 @@ export const users = pgTable(
     emailIdx: index('users_email_idx').on(table.email),
     roleIdx: index('users_role_idx').on(table.role),
     activeIdx: index('users_active_idx').on(table.isActive),
-  })
+  }),
 );
 
 /**

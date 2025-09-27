@@ -25,7 +25,8 @@ async function bootstrap() {
   // Enhanced Swagger API documentation
   const config = new DocumentBuilder()
     .setTitle('🎓 SikshaPath API')
-    .setDescription(`
+    .setDescription(
+      `
       <div style="margin-bottom: 20px;">
         <h2>🎓 Nepal's Premier E-Learning Platform API</h2>
         <p><strong>Version:</strong> 1.0.0 | <strong>Environment:</strong> Development</p>
@@ -71,12 +72,23 @@ async function bootstrap() {
       </div>
       
       <p><strong>Base URL:</strong> <code>http://localhost:${process.env.PORT || 3000}</code></p>
-    `)
+    `,
+    )
     .setVersion('1.0.0')
-    .setContact('SikshaPath Development Team', 'https://siksha-path.com', 'dev@siksha-path.com')
+    .setContact(
+      'SikshaPath Development Team',
+      'https://siksha-path.com',
+      'dev@siksha-path.com',
+    )
     .setLicense('MIT License', 'https://opensource.org/licenses/MIT')
-    .addServer(`http://localhost:${process.env.PORT || 3000}`, '🔧 Development Server')
-    .addServer('https://api.siksha-path.com', '🚀 Production Server (Coming Soon)')
+    .addServer(
+      `http://localhost:${process.env.PORT || 3000}`,
+      '🔧 Development Server',
+    )
+    .addServer(
+      'https://api.siksha-path.com',
+      '🚀 Production Server (Coming Soon)',
+    )
     .addBearerAuth(
       {
         type: 'http',
@@ -86,16 +98,40 @@ async function bootstrap() {
         description: 'Enter your JWT access token (get it from /auth/login)',
         in: 'header',
       },
-      'JWT-auth'
+      'JWT-auth',
     )
-    .addTag('🔐 Authentication', 'User registration, login, logout, and password management')
-    .addTag('👥 User Management', 'Profile management, admin operations, and role-based features')
-    .addTag('📚 Course Management', 'Course CRUD, enrollment, and progress tracking')
-    .addTag('💰 Payment System', 'Payment processing, transactions, and revenue management')
-    .addTag('🎥 Live Classes', 'Zoom integration, scheduling, and virtual classroom management')
-    .addTag('💬 Real-time Chat', 'Course discussions, messaging, and notifications')
-    .addTag('📁 Resource Management', 'File uploads, downloads, and content organization')
-    .addTag('📊 Analytics', 'Platform statistics, user activity, and performance metrics')
+    .addTag(
+      '🔐 Authentication',
+      'User registration, login, logout, and password management',
+    )
+    .addTag(
+      '👥 User Management',
+      'Profile management, admin operations, and role-based features',
+    )
+    .addTag(
+      '📚 Course Management',
+      'Course CRUD, enrollment, and progress tracking',
+    )
+    .addTag(
+      '💰 Payment System',
+      'Payment processing, transactions, and revenue management',
+    )
+    .addTag(
+      '🎥 Live Classes',
+      'Zoom integration, scheduling, and virtual classroom management',
+    )
+    .addTag(
+      '💬 Real-time Chat',
+      'Course discussions, messaging, and notifications',
+    )
+    .addTag(
+      '📁 Resource Management',
+      'File uploads, downloads, and content organization',
+    )
+    .addTag(
+      '📊 Analytics',
+      'Platform statistics, user activity, and performance metrics',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app as any, config);
@@ -414,10 +450,14 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
-  
+
   console.log(`🚀 SikshaPath API is running on: http://localhost:${port}`);
-  console.log(`📚 Authentication endpoints available at: http://localhost:${port}/auth`);
-  console.log(`� API Documentation available at: http://localhost:${port}/api/docs`);
+  console.log(
+    `📚 Authentication endpoints available at: http://localhost:${port}/auth`,
+  );
+  console.log(
+    `� API Documentation available at: http://localhost:${port}/api/docs`,
+  );
 }
 
 bootstrap();

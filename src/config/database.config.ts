@@ -9,7 +9,7 @@ import postgres from 'postgres';
  */
 export const createDatabaseConnection = (configService: ConfigService) => {
   const connectionString = configService.get<string>('DATABASE_URL');
-  
+
   if (!connectionString) {
     throw new Error('DATABASE_URL is not defined in environment variables');
   }

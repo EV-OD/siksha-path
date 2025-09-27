@@ -1,10 +1,10 @@
-import { 
-  Injectable, 
-  UnauthorizedException, 
-  ConflictException, 
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
   BadRequestException,
   NotFoundException,
-  Inject
+  Inject,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -16,19 +16,19 @@ import postgres from 'postgres';
 import { eq, and } from 'drizzle-orm';
 
 import { users } from '../database/schemas/users.schema';
-import { 
-  RegisterDto, 
-  LoginDto, 
-  ChangePasswordDto, 
-  ForgotPasswordDto, 
+import {
+  RegisterDto,
+  LoginDto,
+  ChangePasswordDto,
+  ForgotPasswordDto,
   ResetPasswordDto,
-  UserRole 
+  UserRole,
 } from './dto/auth.dto';
-import { 
-  LoginResponseDto, 
-  JwtPayload, 
+import {
+  LoginResponseDto,
+  JwtPayload,
   RefreshTokenDto,
-  AuthSuccessDto
+  AuthSuccessDto,
 } from './dto/auth-response.dto';
 
 @Injectable()
@@ -176,15 +176,19 @@ export class AuthService {
   /**
    * Refresh access token using refresh token
    */
-  async refreshToken(refreshTokenDto: RefreshTokenDto): Promise<LoginResponseDto> {
+  async refreshToken(
+    refreshTokenDto: RefreshTokenDto,
+  ): Promise<LoginResponseDto> {
     const { refreshToken } = refreshTokenDto;
 
     try {
       // Verify refresh token
       const payload = await this.jwtService.verifyAsync(refreshToken);
-      
+
       // Check if refresh token exists in cache
-      const storedToken = await this.cacheManager.get(`refresh_token:${payload.sub}`);
+      const storedToken = await this.cacheManager.get(
+        `refresh_token:${payload.sub}`,
+      );
       if (!storedToken || storedToken !== refreshToken) {
         throw new UnauthorizedException('Invalid refresh token');
       }
@@ -260,8 +264,8 @@ export class AuthService {
    * Change user password
    */
   async changePassword(
-    userId: string, 
-    changePasswordDto: ChangePasswordDto
+    userId: string,
+    changePasswordDto: ChangePasswordDto,
   ): Promise<AuthSuccessDto> {
     const { currentPassword, newPassword } = changePasswordDto;
 
@@ -272,7 +276,10 @@ export class AuthService {
     }
 
     // Verify current password
-    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    const isCurrentPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password,
+    );
     if (!isCurrentPasswordValid) {
       throw new BadRequestException('Current password is incorrect');
     }
@@ -284,7 +291,7 @@ export class AuthService {
     // Update password
     await this.db
       .update(users)
-      .set({ 
+      .set({
         password: hashedNewPassword,
         updatedAt: new Date(),
       })
@@ -292,7 +299,7 @@ export class AuthService {
 
     // Invalidate all existing tokens for security
     await this.cacheManager.del(`refresh_token:${userId}`);
-    
+
     return {
       message: 'Password changed successfully',
       success: true,
@@ -302,7 +309,9 @@ export class AuthService {
   /**
    * Initiate password reset process
    */
-  async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<AuthSuccessDto> {
+  async forgotPassword(
+    forgotPasswordDto: ForgotPasswordDto,
+  ): Promise<AuthSuccessDto> {
     const { email } = forgotPasswordDto;
 
     // Find user
@@ -352,21 +361,27 @@ export class AuthService {
   /**
    * Reset password using reset token
    */
-  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<AuthSuccessDto> {
+  async resetPassword(
+    resetPasswordDto: ResetPasswordDto,
+  ): Promise<AuthSuccessDto> {
     const { resetToken, newPassword } = resetPasswordDto;
 
     try {
       // Verify reset token
       const payload = await this.jwtService.verifyAsync(resetToken);
-      
+
       if (payload.type !== 'reset') {
         throw new UnauthorizedException('Invalid reset token');
       }
 
       // Check if reset token exists in cache
-      const storedToken = await this.cacheManager.get(`reset_token:${payload.sub}`);
+      const storedToken = await this.cacheManager.get(
+        `reset_token:${payload.sub}`,
+      );
       if (!storedToken || storedToken !== resetToken) {
-        throw new UnauthorizedException('Reset token has expired or is invalid');
+        throw new UnauthorizedException(
+          'Reset token has expired or is invalid',
+        );
       }
 
       // Hash new password
@@ -376,7 +391,7 @@ export class AuthService {
       // Update password
       await this.db
         .update(users)
-        .set({ 
+        .set({
           password: hashedPassword,
           updatedAt: new Date(),
         })
@@ -384,7 +399,7 @@ export class AuthService {
 
       // Clean up reset token
       await this.cacheManager.del(`reset_token:${payload.sub}`);
-      
+
       // Invalidate all existing refresh tokens
       await this.cacheManager.del(`refresh_token:${payload.sub}`);
 
@@ -428,17 +443,23 @@ export class AuthService {
   /**
    * Check if token is blacklisted (used by JWT strategy)
    */
-  async isTokenBlacklisted(userId: string, tokenIssuedAt: number): Promise<boolean> {
+  async isTokenBlacklisted(
+    userId: string,
+    tokenIssuedAt: number,
+  ): Promise<boolean> {
     // For simplicity, we'll use a single blacklist key per user with timestamp
     // In production, consider using a more sophisticated approach
     const blacklistKey = `blacklist:${userId}`;
     const blacklistData = await this.cacheManager.get(blacklistKey);
-    
+
     if (blacklistData) {
-      const timestamp = typeof blacklistData === 'string' ? parseInt(blacklistData) : blacklistData as number;
+      const timestamp =
+        typeof blacklistData === 'string'
+          ? parseInt(blacklistData)
+          : (blacklistData as number);
       return timestamp >= tokenIssuedAt;
     }
-    
+
     return false;
   }
 }

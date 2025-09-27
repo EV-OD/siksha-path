@@ -1,4 +1,14 @@
-import { pgTable, uuid, varchar, text, numeric, timestamp, pgEnum, index, integer } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  text,
+  numeric,
+  timestamp,
+  pgEnum,
+  index,
+  integer,
+} from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { users } from './users.schema';
 
@@ -6,13 +16,21 @@ import { users } from './users.schema';
  * Course Status Enum
  * Tracks the lifecycle of a course
  */
-export const courseStatusEnum = pgEnum('course_status', ['draft', 'published', 'archived']);
+export const courseStatusEnum = pgEnum('course_status', [
+  'draft',
+  'published',
+  'archived',
+]);
 
 /**
- * Course Difficulty Enum  
+ * Course Difficulty Enum
  * Helps students choose appropriate courses
  */
-export const courseDifficultyEnum = pgEnum('course_difficulty', ['beginner', 'intermediate', 'advanced']);
+export const courseDifficultyEnum = pgEnum('course_difficulty', [
+  'beginner',
+  'intermediate',
+  'advanced',
+]);
 
 /**
  * Course Category Enum
@@ -20,9 +38,9 @@ export const courseDifficultyEnum = pgEnum('course_difficulty', ['beginner', 'in
  * Based on common Nepal education categories
  */
 export const courseCategoryEnum = pgEnum('course_category', [
-  'mathematics', 
-  'science', 
-  'english', 
+  'mathematics',
+  'science',
+  'english',
   'nepali',
   'social_studies',
   'computer_science',
@@ -31,19 +49,24 @@ export const courseCategoryEnum = pgEnum('course_category', [
   'business',
   'arts',
   'language',
-  'other'
+  'other',
 ]);
 
 /**
  * Course Language Enum
  * Supports multilingual content delivery
  */
-export const courseLanguageEnum = pgEnum('course_language', ['nepali', 'english', 'hindi', 'mixed']);
+export const courseLanguageEnum = pgEnum('course_language', [
+  'nepali',
+  'english',
+  'hindi',
+  'mixed',
+]);
 
 /**
  * Courses Table Schema
  * Central table for all course information
- * 
+ *
  * Design principles:
  * - Comprehensive metadata for course discovery
  * - Pricing support for both free and paid courses
@@ -55,45 +78,51 @@ export const courses = pgTable(
   'courses',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    teacherId: uuid('teacher_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-    
+    teacherId: uuid('teacher_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+
     // Basic course information
     title: varchar('title', { length: 255 }).notNull(),
     slug: varchar('slug', { length: 255 }).notNull().unique(),
     description: text('description').notNull(),
     shortDescription: varchar('short_description', { length: 500 }),
-    
+
     // Course metadata
     category: courseCategoryEnum('category').notNull(),
     language: courseLanguageEnum('language').notNull().default('nepali'),
-    difficulty: courseDifficultyEnum('difficulty').notNull().default('beginner'),
+    difficulty: courseDifficultyEnum('difficulty')
+      .notNull()
+      .default('beginner'),
     status: courseStatusEnum('status').notNull().default('draft'),
-    
+
     // Pricing information
-    price: numeric('price', { precision: 10, scale: 2 }).notNull().default('0.00'),
+    price: numeric('price', { precision: 10, scale: 2 })
+      .notNull()
+      .default('0.00'),
     originalPrice: numeric('original_price', { precision: 10, scale: 2 }),
     currency: varchar('currency', { length: 3 }).notNull().default('NPR'),
-    
+
     // Course structure
     totalDuration: integer('total_duration'), // in minutes
     totalLessons: integer('total_lessons').default(0),
     totalResources: integer('total_resources').default(0),
-    
+
     // Marketing and SEO
     thumbnailUrl: text('thumbnail_url'),
     videoPreviewUrl: text('video_preview_url'),
     tags: text('tags'), // JSON array stored as text
-    
+
     // Course requirements and outcomes
     prerequisites: text('prerequisites'),
     learningOutcomes: text('learning_outcomes'), // JSON array stored as text
     targetAudience: text('target_audience'),
-    
+
     // Statistics (updated via triggers/jobs)
     enrollmentCount: integer('enrollment_count').default(0),
     rating: numeric('rating', { precision: 3, scale: 2 }).default('0.00'),
     totalRatings: integer('total_ratings').default(0),
-    
+
     // Timestamps
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -108,7 +137,7 @@ export const courses = pgTable(
     slugIdx: index('courses_slug_idx').on(table.slug),
     enrollmentIdx: index('courses_enrollment_idx').on(table.enrollmentCount),
     ratingIdx: index('courses_rating_idx').on(table.rating),
-  })
+  }),
 );
 
 /**

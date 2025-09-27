@@ -1,12 +1,15 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createDatabaseConnection, DATABASE_CONNECTION } from '../config/database.config';
+import {
+  createDatabaseConnection,
+  DATABASE_CONNECTION,
+} from '../config/database.config';
 
 /**
  * Database Module
  * Provides database connection using Drizzle ORM
  * This is a global module so it's available throughout the application
- * 
+ *
  * The module follows NestJS best practices:
  * - Uses dependency injection for configuration
  * - Exports the database connection for use in other modules

@@ -1,7 +1,7 @@
 /**
  * Database Schema Index
  * Centralizes all database schemas and their relationships
- * 
+ *
  * This file exports all schemas and provides a complete picture
  * of the database structure for Drizzle ORM
  */
@@ -16,11 +16,7 @@ export * from './chat.schema';
 export * from './payments.schema';
 
 // Re-export schema objects for Drizzle operations
-export {
-  users,
-  usersRelations,
-  userRoleEnum,
-} from './users.schema';
+export { users, usersRelations, userRoleEnum } from './users.schema';
 
 export {
   courses,
