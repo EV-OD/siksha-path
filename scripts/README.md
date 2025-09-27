@@ -112,10 +112,38 @@ pnpm test:config && pnpm test:connection
 - `0`: All tests passed
 - `1`: One or more tests failed
 
+## Adding New Service Tests
+
+When integrating a new external service, use the provided template:
+
+1. **Copy the template**:
+```bash
+cp scripts/service-test-template.ts scripts/test-[service-name].ts
+```
+
+2. **Update the template**:
+- Replace `[SERVICE_NAME]` with actual service name
+- Update environment variables section
+- Implement actual connection logic
+- Add service-specific test operations
+
+3. **Add to package.json**:
+```json
+{
+  "scripts": {
+    "test:service-name": "ts-node scripts/test-service-name.ts"
+  }
+}
+```
+
+4. **Update main test suite**:
+Add the new service test to `scripts/test-connections.ts`
+
 ## File Structure
 ```
 scripts/
-├── test-connections.ts    # Full TypeScript test suite
-├── quick-test.js         # Fast configuration check
-└── README.md            # This documentation
+├── test-connections.ts        # Full TypeScript test suite
+├── quick-test.js             # Fast configuration check
+├── service-test-template.ts  # Template for new service tests
+└── README.md                # This documentation
 ```
