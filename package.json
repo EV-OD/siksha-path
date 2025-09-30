@@ -23,6 +23,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:drop": "drizzle-kit drop",
+    "database": "ts-node scripts/migrate.ts",
     "test:connection": "ts-node scripts/test-connections.ts",
     "test:config": "node scripts/quick-test.js"
   },

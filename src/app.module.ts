@@ -7,6 +7,7 @@ import { DatabaseModule } from './database/database.module';
 import { RedisModule } from './redis/redis.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { CoursesModule } from './courses/courses.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import appConfig from './config/app.config';
@@ -46,8 +47,10 @@ import appConfig from './config/app.config';
     // User management module
     UsersModule,
 
+    // Course management module
+    CoursesModule,
+
     // Future feature modules:
-    // CoursesModule,
     // PaymentsModule,
     // etc.
   ],
