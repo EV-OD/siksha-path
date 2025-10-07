@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsUUID, IsOptional, IsString, IsNumber, Min, Max } from 'class-validator';
+import { IsUUID, IsOptional, IsString, IsNumber, Min, Max, IsNotEmpty } from 'class-validator';
 import { enrollmentStatusEnum, enrollmentTypeEnum } from '../../database/schemas/enrollments.schema';
 
 export class EnrollInCourseDto {
@@ -8,6 +8,7 @@ export class EnrollInCourseDto {
     example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @IsUUID()
+  @IsNotEmpty()
   courseId: string;
 }
 
@@ -133,5 +134,6 @@ export class UpdateProgressDto {
   @IsNumber()
   @Min(0)
   @Max(100)
+  @IsNotEmpty()
   progressPercentage: number;
 }

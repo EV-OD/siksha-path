@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from '../src/app.module';
@@ -18,6 +18,7 @@ describe('Enrollments (e2e)', () => {
   let databaseService: DatabaseService;
   let studentToken: string;
   let teacherToken: string;
+  let createdEnrollmentId: string;
 
   const testStudent = {
     id: '550e8400-e29b-41d4-a716-446655440001',
@@ -26,8 +27,8 @@ describe('Enrollments (e2e)', () => {
     lastName: 'Student',
     role: 'student',
     password: 'hashed-password',
-    isVerified: true,
-    isActive: true,
+    isVerified: 'true',
+    isActive: 'true',
   };
 
   const testTeacher = {
@@ -37,8 +38,8 @@ describe('Enrollments (e2e)', () => {
     lastName: 'Teacher',
     role: 'teacher',
     password: 'hashed-password',
-    isVerified: true,
-    isActive: true,
+    isVerified: 'true',
+    isActive: 'true',
   };
 
   const testCourse = {
@@ -64,6 +65,16 @@ describe('Enrollments (e2e)', () => {
     app = moduleFixture.createNestApplication();
     jwtService = moduleFixture.get<JwtService>(JwtService);
     configService = moduleFixture.get<ConfigService>(ConfigService);
+
+    // Apply global validation pipe (same as main.ts)
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: false,
+        disableErrorMessages: false,
+      }),
+    );
 
     // Create database connection for test data setup
     const pool = new Pool({
@@ -146,6 +157,7 @@ describe('Enrollments (e2e)', () => {
           expect(response.body.courseId).toBe(testCourse.id);
           expect(response.body.status).toBe('active');
           expect(response.body.type).toBe('free');
+          createdEnrollmentId = response.body.id; // Store for later tests
         });
     });
 
@@ -160,7 +172,7 @@ describe('Enrollments (e2e)', () => {
       return request(app.getHttpServer())
         .post('/enrollments')
         .set('Authorization', `Bearer ${studentToken}`)
-        .send({ courseId: 'non-existent-course' })
+        .send({ courseId: '550e8400-e29b-41d4-a716-446655440999' }) // Valid UUID that doesn't exist
         .expect(404);
     });
   });
@@ -238,7 +250,7 @@ describe('Enrollments (e2e)', () => {
 
     it('should return 404 for non-existent enrollment', () => {
       return request(app.getHttpServer())
-        .get('/enrollments/non-existent-enrollment')
+        .get('/enrollments/550e8400-e29b-41d4-a716-446655440998')
         .set('Authorization', `Bearer ${studentToken}`)
         .expect(404);
     });
@@ -284,7 +296,7 @@ describe('Enrollments (e2e)', () => {
 
     it('should validate progress percentage range', () => {
       return request(app.getHttpServer())
-        .put('/enrollments/550e8400-e29b-41d4-a716-446655440004/progress')
+        .put(`/enrollments/${createdEnrollmentId}/progress`)
         .set('Authorization', `Bearer ${studentToken}`)
         .send({ progressPercentage: 150 })
         .expect(400);
@@ -292,7 +304,7 @@ describe('Enrollments (e2e)', () => {
 
     it('should return 404 for non-existent enrollment', () => {
       return request(app.getHttpServer())
-        .put('/enrollments/non-existent-enrollment/progress')
+        .put('/enrollments/550e8400-e29b-41d4-a716-446655440997/progress')
         .set('Authorization', `Bearer ${studentToken}`)
         .send({ progressPercentage: 50 })
         .expect(404);
@@ -342,7 +354,7 @@ describe('Enrollments (e2e)', () => {
 
     it('should return 404 for non-existent enrollment', () => {
       return request(app.getHttpServer())
-        .delete('/enrollments/non-existent-enrollment')
+        .delete('/enrollments/550e8400-e29b-41d4-a716-446655440996')
         .set('Authorization', `Bearer ${studentToken}`)
         .expect(404);
     });
@@ -370,7 +382,7 @@ describe('Enrollments (e2e)', () => {
 
     it('should return 404 for non-existent course', () => {
       return request(app.getHttpServer())
-        .get('/enrollments/course/non-existent-course')
+        .get('/enrollments/course/550e8400-e29b-41d4-a716-446655440995')
         .set('Authorization', `Bearer ${teacherToken}`)
         .expect(404);
     });
@@ -414,7 +426,7 @@ describe('Enrollments (e2e)', () => {
 
     it('should validate progress update DTO', () => {
       return request(app.getHttpServer())
-        .put('/enrollments/test-enrollment-id/progress')
+        .put(`/enrollments/${createdEnrollmentId}/progress`)
         .set('Authorization', `Bearer ${studentToken}`)
         .send({ progressPercentage: 'not-a-number' })
         .expect(400);

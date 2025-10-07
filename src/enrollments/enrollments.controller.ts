@@ -11,6 +11,7 @@ import {
   Request,
   HttpCode,
   HttpStatus,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -95,7 +96,7 @@ export class EnrollmentsController {
   })
   @ApiResponse({ status: 404, description: 'Enrollment not found' })
   async getEnrollment(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
   ): Promise<EnrollmentResponseDto> {
     return this.enrollmentsService.getEnrollmentById(id);
   }
@@ -110,7 +111,7 @@ export class EnrollmentsController {
   })
   @ApiResponse({ status: 404, description: 'Enrollment not found' })
   async updateProgress(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Request() req,
     @Body() updateProgressDto: UpdateProgressDto,
   ): Promise<EnrollmentResponseDto> {
@@ -132,7 +133,7 @@ export class EnrollmentsController {
   @ApiResponse({ status: 404, description: 'Enrollment not found' })
   @HttpCode(HttpStatus.OK)
   async unenroll(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Request() req,
   ): Promise<{ message: string }> {
     return this.enrollmentsService.unenrollStudent(id, req.user.id);
@@ -151,7 +152,7 @@ export class EnrollmentsController {
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   async getCourseEnrollments(
-    @Param('courseId') courseId: string,
+    @Param('courseId', ParseUUIDPipe) courseId: string,
     @Request() req,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
