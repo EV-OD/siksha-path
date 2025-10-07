@@ -10,10 +10,10 @@
 
 ## 📊 Progress Tracking
 
-- **Total Tasks**: 89
-- **Completed**: 28 (31%)
+- **Total Tasks**: 90
+- **Completed**: 29 (32%)
 - **In Progress**: 0 (0%)
-- **Pending**: 61 (69%)
+- **Pending**: 61 (68%)
 
 ---
 
@@ -541,7 +541,17 @@
   - **Assignee**: Backend Developer
   - **Estimated Time**: 8 hours
   - **Dependencies**: All course features
-  - **Status**: ✅ Completed (Comprehensive e2e tests for courses and enrollments implemented)
+  - **Status**: ✅ Completed (Comprehensive e2e tests for courses implemented)
+
+- [x] **TEST-003b** Enrollment system tests
+  - [x] Enrollment CRUD operation tests
+  - [x] Progress tracking tests
+  - [x] Teacher enrollment management tests
+  - [x] Input validation and error handling tests
+  - **Assignee**: Backend Developer
+  - **Estimated Time**: 6 hours
+  - **Dependencies**: ENROLLMENT-001
+  - **Status**: ✅ Completed (26 comprehensive e2e tests for enrollments implemented)
 
 - [ ] **TEST-004** Payment system tests
   - [ ] Payment gateway integration tests
