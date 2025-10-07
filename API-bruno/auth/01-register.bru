@@ -10,13 +10,12 @@ post {
   auth: none
 }
 
-body {
+body:json {
   {
-    "email": "test@example.com",
-    "firstName": "Test",
-    "lastName": "User",
-    "password": "password123",
-    "role": "student"
+      "email": "admin-auth@example.com",
+      "fullName": "Admin Auth",
+      "role": "admin",
+      "password": "hashed-password"
   }
 }
 
