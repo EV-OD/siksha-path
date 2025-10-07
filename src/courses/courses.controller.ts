@@ -1,10 +1,17 @@
 import {
   Controller,
   Get,
+  Post,
+  Put,
+  Delete,
   Param,
   Query,
+  Body,
   ParseUUIDPipe,
   ValidationPipe,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -12,6 +19,8 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
+  ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { CoursesService } from './courses.service';
 import { CourseFilterDto } from './dto/course-filter.dto';
@@ -21,10 +30,16 @@ import {
   CourseDetailResponseDto,
 } from './dto/course-response.dto';
 import { Public } from '../auth/decorators/auth.decorators';
+import { Roles } from '../auth/decorators/auth.decorators';
+import { UserRole } from '../auth/dto/auth.dto';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { ResourceGuard } from '../common/guards/resource.guard';
+import { OwnResource, PublicResource } from '../common/decorators/resource.decorators';
+import { CreateCourseDto, UpdateCourseDto } from './dto/course.dto';
 
 @ApiTags('Courses')
 @Controller('courses')
-@Public() // Make all course browsing endpoints public
+@UseGuards(ResourceGuard)
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
@@ -32,6 +47,7 @@ export class CoursesController {
    * Get all courses with filtering, searching, and pagination
    */
   @Get()
+  @Public()
   @ApiOperation({
     summary: 'List all available courses',
     description:
@@ -131,6 +147,7 @@ export class CoursesController {
    * Search courses by title or description
    */
   @Get('search')
+  @Public()
   @ApiOperation({
     summary: 'Search courses',
     description: 'Search courses by title, description, or tags',
@@ -175,6 +192,7 @@ export class CoursesController {
    * Get popular courses
    */
   @Get('popular')
+  @Public()
   @ApiOperation({
     summary: 'Get popular courses',
     description: 'Get courses sorted by enrollment count and rating',
@@ -201,6 +219,7 @@ export class CoursesController {
    * Filter courses by category
    */
   @Get('category/:category')
+  @Public()
   @ApiOperation({
     summary: 'Get courses by category',
     description: 'Get all courses in a specific category',
@@ -257,6 +276,7 @@ export class CoursesController {
    * Filter courses by language
    */
   @Get('language/:language')
+  @Public()
   @ApiOperation({
     summary: 'Get courses by language',
     description: 'Get all courses in a specific language',
@@ -300,6 +320,7 @@ export class CoursesController {
    * Get free courses
    */
   @Get('free')
+  @Public()
   @ApiOperation({
     summary: 'Get free courses',
     description: 'Get all free courses (price = 0)',
@@ -337,6 +358,7 @@ export class CoursesController {
    * Get course details by ID
    */
   @Get(':id')
+  @Public()
   @ApiOperation({
     summary: 'Get course details by ID',
     description: 'Get detailed information about a specific course',
@@ -365,6 +387,7 @@ export class CoursesController {
    * Get course details by slug
    */
   @Get('slug/:slug')
+  @Public()
   @ApiOperation({
     summary: 'Get course details by slug',
     description:
@@ -388,5 +411,182 @@ export class CoursesController {
     @Param('slug') slug: string,
   ): Promise<CourseDetailResponseDto> {
     return this.coursesService.findBySlug(slug);
+  }
+
+  /**
+   * Create a new course (Teachers only)
+   */
+  @Post()
+  @Roles(UserRole.TEACHER)
+  @HttpCode(HttpStatus.CREATED)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Create a new course',
+    description: 'Create a new course as a teacher. Only users with teacher role can create courses.',
+  })
+  @ApiBody({ type: CreateCourseDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Course created successfully',
+    type: CourseDetailResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid input data',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Teachers only',
+  })
+  async create(
+    @Body(ValidationPipe) createCourseDto: CreateCourseDto,
+    @CurrentUser() user: any,
+  ): Promise<CourseDetailResponseDto> {
+    return this.coursesService.create(createCourseDto, user.id);
+  }
+
+  /**
+   * Update course (Teacher owner or Admin only)
+   */
+  @Put(':id')
+  @OwnResource()
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Update course',
+    description: 'Update course information. Only the course teacher or admin can update.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Course UUID',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @ApiBody({ type: UpdateCourseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Course updated successfully',
+    type: CourseDetailResponseDto,
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Not the course owner',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Course not found',
+  })
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body(ValidationPipe) updateCourseDto: UpdateCourseDto,
+    @CurrentUser() user: any,
+  ): Promise<CourseDetailResponseDto> {
+    return this.coursesService.update(id, updateCourseDto, user.id);
+  }
+
+  /**
+   * Delete course (Teacher owner or Admin only)
+   */
+  @Delete(':id')
+  @OwnResource()
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Delete course',
+    description: 'Delete a course. Only the course teacher or admin can delete. Course must have zero enrollments.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Course UUID',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Course deleted successfully',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Not the course owner or course has enrollments',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Course not found',
+  })
+  async delete(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: any,
+  ): Promise<{ message: string }> {
+    return this.coursesService.delete(id, user.id);
+  }
+
+  /**
+   * Publish course (Teacher owner or Admin only)
+   */
+  @Post(':id/publish')
+  @OwnResource()
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Publish course',
+    description: 'Publish a draft course to make it visible to students. Only the course teacher or admin can publish.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Course UUID',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Course published successfully',
+    type: CourseDetailResponseDto,
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Not the course owner',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Course not found',
+  })
+  async publish(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: any,
+  ): Promise<CourseDetailResponseDto> {
+    return this.coursesService.publish(id, user.id);
+  }
+
+  /**
+   * Unpublish course (Teacher owner or Admin only)
+   */
+  @Post(':id/unpublish')
+  @OwnResource()
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Unpublish course',
+    description: 'Unpublish a course to hide it from students. Only the course teacher or admin can unpublish.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Course UUID',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Course unpublished successfully',
+    type: CourseDetailResponseDto,
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Not the course owner',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Course not found',
+  })
+  async unpublish(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: any,
+  ): Promise<CourseDetailResponseDto> {
+    return this.coursesService.unpublish(id, user.id);
   }
 }

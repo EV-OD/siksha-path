@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { CoursesController } from './courses.controller';
 import { CoursesService } from './courses.service';
 import { DatabaseModule } from '../database/database.module';
+import { ResourceGuard } from '../common/guards/resource.guard';
 
 /**
  * Courses Module
@@ -18,7 +19,7 @@ import { DatabaseModule } from '../database/database.module';
 @Module({
   imports: [DatabaseModule],
   controllers: [CoursesController],
-  providers: [CoursesService],
+  providers: [CoursesService, ResourceGuard],
   exports: [CoursesService], // Export service for use in other modules
 })
 export class CoursesModule {}

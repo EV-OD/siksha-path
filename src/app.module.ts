@@ -8,8 +8,10 @@ import { RedisModule } from './redis/redis.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { CoursesModule } from './courses/courses.module';
+import { EnrollmentsModule } from './enrollments/enrollments.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
+import { ResourceGuard } from './common/guards/resource.guard';
 import appConfig from './config/app.config';
 
 /**
@@ -50,6 +52,9 @@ import appConfig from './config/app.config';
     // Course management module
     CoursesModule,
 
+    // Enrollment management module
+    EnrollmentsModule,
+
     // Future feature modules:
     // PaymentsModule,
     // etc.
@@ -66,6 +71,11 @@ import appConfig from './config/app.config';
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
+    },
+    // Global Resource-Level Permissions Guard
+    {
+      provide: APP_GUARD,
+      useClass: ResourceGuard,
     },
   ],
 })
